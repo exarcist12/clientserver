@@ -20,8 +20,9 @@ public class HttpServer {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Сервер запущен на порту: " + port);
             while (running) {
+                Socket socket = serverSocket.accept();
                 service.submit(()->{
-                    try(Socket socket = serverSocket.accept()){
+                    try(socket){
                         byte[] buffer = new byte[8192];
                         int n = socket.getInputStream().read(buffer);
                         String rawRequest = new String(buffer, 0, n);
