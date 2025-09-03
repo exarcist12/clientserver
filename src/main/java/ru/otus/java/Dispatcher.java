@@ -1,8 +1,12 @@
 package ru.otus.java;
 
+import com.google.gson.Gson;
+import ru.otus.java.error.BadRequestException;
+import ru.otus.java.error.ErrorDto;
 import ru.otus.java.processors.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +27,18 @@ public class Dispatcher {
             defaultNotFoundProcessor.execute(request, output);
             return;
         }
-        processors.get(request.getUri()).execute(request, output);
+
+        try {
+            processors.get(request.getUri()).execute(request, output);
+        } catch (BadRequestException e){
+            ErrorDto errorDto = new ErrorDto(e.getCode() , e.getMessage());
+            Gson gson = new Gson();
+            String response = "" +
+                    "HTTP/1.1 400 Bad Request\r\n" +
+                    "Content-Type: application/json\r\n" +
+                    "\r\n" +
+                    gson.toJson(errorDto);
+            output.write(response.getBytes(StandardCharsets.UTF_8));
+        }
     }
 }
