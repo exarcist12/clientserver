@@ -1,0 +1,28 @@
+CREATE TABLE item (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(50),
+    price NUMERIC
+);
+
+CREATE TABLE category (
+    id SERIAL PRIMARY KEY,
+    category VARCHAR(50)
+);
+
+CREATE TABLE item_category (
+    item_id INTEGER REFERENCES item(id),
+    category_id INTEGER REFERENCES category(id),
+    PRIMARY KEY (item_id, category_id)
+);
+
+
+INSERT INTO category (category) VALUES ('books');
+INSERT INTO category (category) VALUES ('electronics');
+INSERT INTO category (category) VALUES ('sale');
+
+INSERT INTO item (title, price) VALUES ('Harry Potter', 990);
+INSERT INTO item (title, price) VALUES ('Smartphone', 29990);
+
+INSERT INTO item_category (item_id, category_id) VALUES (1, 1);
+INSERT INTO item_category (item_id, category_id) VALUES (2, 2);
+INSERT INTO item_category (item_id, category_id) VALUES (2, 3);

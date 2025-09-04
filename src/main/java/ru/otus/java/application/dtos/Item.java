@@ -2,26 +2,30 @@ package ru.otus.java.application.dtos;
 
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Item {
-    private Long id;
+    private Integer id;
     private String title;
-    private BigDecimal price;
-    private int[] categories = new int[]{4, 10, 15};
+    private Integer price;
+ //   private int[] categories = new int[]{4, 10, 15};
 
-    public int[] getCategories() {
+    private List<String> categories = new ArrayList<>();
+
+    public  List<String>  getCategories() {
         return categories;
     }
 
-    public void setCategories(int[] categories) {
+    public void setCategories( List<String>  categories) {
         this.categories = categories;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -33,18 +37,25 @@ public class Item {
         this.title = title;
     }
 
-    public BigDecimal getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
     public Item() {
     }
 
-    public Item(Long id, String title, BigDecimal price, int[] categories) {
+//    public Item(Long id, String title, BigDecimal price, int[] categories) {
+//        this.id = id;
+//        this.title = title;
+//        this.price = price;
+//        this.categories = categories;
+//    }
+
+    public Item(Integer id, String title, Integer price, List<String> categories) {
         this.id = id;
         this.title = title;
         this.price = price;
