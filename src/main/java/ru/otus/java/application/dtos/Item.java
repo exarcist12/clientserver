@@ -44,9 +44,11 @@ public class Item {
     public Item() {
     }
 
-    public Item(Long id, String title, BigDecimal price) {
+    public Item(Long id, String title, BigDecimal price, int[] categories) {
         this.id = id;
         this.title = title;
         this.price = price;
+        this.categories = categories;
     }
 }
+

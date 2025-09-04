@@ -18,6 +18,7 @@ public class HttpRequest {
     private String rawRequest;
     private String method;
     private String uri;
+    private String body;
     private Map<String, String> parameters;
     private Map<String, String> headers  = new HashMap<>();
     public String getMethod() {
@@ -27,7 +28,12 @@ public class HttpRequest {
     public String getUri() {
         return uri;
     }
-
+    public String getBody() {
+        return body;
+    }
+    public String getRoutingKey() {
+        return method + " " + uri;
+    }
     public String getParameter(String key) {
         return parameters.get(key);
     }
@@ -47,7 +53,7 @@ public class HttpRequest {
         int endIndex = rawRequest.indexOf(' ', startIndex + 1);
         method = rawRequest.substring(0, startIndex);
         uri = rawRequest.substring(startIndex + 1, endIndex);
-
+        body = rawRequest.substring(rawRequest.indexOf("\r\n\r\n") + 4);
         String[] parts = rawRequest.split("\r\n", 2);
         String heads = parts[1];
         String[] partsHeads = heads.split("\r\n\r\n", 2);

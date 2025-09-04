@@ -2,27 +2,39 @@ package ru.otus.java.processors;
 
 import com.google.gson.Gson;
 import ru.otus.java.HttpRequest;
+import ru.otus.java.application.ItemsRepository;
 import ru.otus.java.application.dtos.Item;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class GetItemInfoProcessor implements RequestProcessor {
+    private ItemsRepository itemsRepository;
+
+    public GetItemInfoProcessor(ItemsRepository itemsRepository) {
+        this.itemsRepository = itemsRepository;
+    }
+
     @Override
     public void execute(HttpRequest request, OutputStream output) throws IOException {
-        long id = Long.parseLong(request.getParameter("id"));
-
+        String result;
         Gson gson = new Gson();
-        Item item = new Item(id, "Milk", BigDecimal.valueOf(90 + id % 20));
-        String jsonItem = gson.toJson(item);
-
+        if (request.containsParameter("id")) {
+            long id = Long.parseLong(request.getParameter("id"));
+            Item item = itemsRepository.getById(id);
+            result = gson.toJson(item);
+        } else {
+            List<Item> items = itemsRepository.getAll();
+            result = gson.toJson(items);
+        }
         String response = "" +
                 "HTTP/1.1 200 OK\r\n" +
                 "Content-Type: application/json\r\n" +
                 "\r\n" +
-                jsonItem;
+                result;
         output.write(response.getBytes(StandardCharsets.UTF_8));
     }
 }
