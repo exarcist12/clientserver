@@ -19,13 +19,13 @@ public class ItemsRepository {
 //        ));
 //    }
 
-    public ItemsRepository() {
-        this.items = new ArrayList<>(Arrays.asList(
-                new Item(1, "Bread", Integer.valueOf(35), List.of("books", "electronics", "sale")),
-                new Item(2, "Milk", Integer.valueOf(80), List.of("sale")),
-                new Item(3, "Cheese", Integer.valueOf(400), List.of("sale"))
-        ));
-    }
+//    public ItemsRepository() {
+//        this.items = new ArrayList<>(Arrays.asList(
+//                new Item(1, "Bread", Integer.valueOf(35), List.of("books", "electronics", "sale")),
+//                new Item(2, "Milk", Integer.valueOf(80), List.of("sale")),
+//                new Item(3, "Cheese", Integer.valueOf(400), List.of("sale"))
+//        ));
+//    }
 
     public List<Item> getAll() {
         return Collections.unmodifiableList(items);

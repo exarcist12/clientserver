@@ -21,8 +21,8 @@ public class Dispatcher {
         this.processors = new HashMap<>();
         this.processors.put("GET /", new HelloWorldProcessor());
         this.processors.put("GET /calculator", new CalculatorProcessor());
-        this.processors.put("GET /items", new GetItemInfoProcessor(itemsRepository));
-        this.processors.put("POST /items", new CreateNewItemProcessor(itemsRepository));
+        this.processors.put("GET /items", new GetItemInfoProcessor());
+        this.processors.put("POST /items", new CreateNewItemProcessor());
         this.defaultNotFoundProcessor = new DefaultNotFoundProcessor();
         this.defaultStaticResourcesProcessor = new DefaultStaticResourcesProcessor();
     }

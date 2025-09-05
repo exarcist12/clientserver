@@ -16,7 +16,9 @@ public class ItemMapper {
             String title = rs.getString("title");
             String price = rs.getString("price");
             String categories = rs.getString("category_name");
-            item = new Item(Integer.valueOf(id), title, Integer.valueOf(price),new ArrayList<>(List.of(categories)));
+            List<String> catList =
+                    categories == null ? new ArrayList<>() : new ArrayList<>(List.of(categories));
+            item = new Item(Integer.valueOf(id), title, Integer.valueOf(price), catList);
         } else if(id.equals(String.valueOf(lastItem.getId()))) {
             item = lastItem;
             String category = rs.getString("category_name");

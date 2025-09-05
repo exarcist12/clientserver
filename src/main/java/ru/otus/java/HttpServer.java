@@ -42,8 +42,12 @@ public class HttpServer {
                             HttpRequest request = new HttpRequest(rawRequest);
                             request.info(true);
                             dispatcher.execute(request, socket.getOutputStream());
-                        } catch (BadRequestException | BadParametersException | StringIndexOutOfBoundsException e) {
-                            send400(socket);
+                        } catch (BadRequestException e) {
+                            send400(socket, e.getCode(), e.getMessage());
+                        } catch (BadParametersException e) {
+                            send400(socket, e.getCode(), e.getMessage());
+                        } catch (StringIndexOutOfBoundsException e) {
+                            send400(socket, "BAD_PARAMETERS", "INPUT_INCORRECT");
                         }
 
                     } catch (Exception e) {
@@ -60,8 +64,8 @@ public class HttpServer {
     }
 
 
-    private void send400(Socket socket) throws IOException {
-        ErrorDto errorDto = new ErrorDto("BAD_PARAMETERS", "INPUT_INCORRECT");
+    private void send400(Socket socket, String code, String message)  throws IOException {
+        ErrorDto errorDto = new ErrorDto(code, message);
         Gson gson = new Gson();
         String response = "" +
                 "HTTP/1.1 400 Bad Request\r\n" +
