@@ -82,14 +82,5 @@ public class HttpRequest {
     public boolean containsParameter(String key) {
         return parameters.containsKey(key);
     }
-
-    public void info(boolean debug) {
-        if (debug) {
-            log.info(rawRequest);
-        }
-        log.info("METHOD: " + method);
-        log.info("URI: " + uri);
-        log.info("PARAMETERS: " + parameters);
-    }
 }
 

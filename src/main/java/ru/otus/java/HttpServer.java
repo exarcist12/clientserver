@@ -1,6 +1,8 @@
 package ru.otus.java;
 
 import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.error.BadParametersException;
 import ru.otus.java.error.BadRequestException;
 import ru.otus.java.error.ErrorDto;
@@ -16,7 +18,7 @@ public class HttpServer {
     private int port;
     private Dispatcher dispatcher;
     private volatile boolean running = true;
-
+    private static final Logger log = LogManager.getLogger(HttpServer.class.getName());
     private final ExecutorService service = Executors.newFixedThreadPool(3);
     public HttpServer(int port) {
         this.port = port;
@@ -25,7 +27,7 @@ public class HttpServer {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Сервер запущен на порту: " + port);
+            log.info("Сервер запущен на порту: " + port);
             while (running) {
                 Socket socket = serverSocket.accept();
                 service.submit(()->{
@@ -33,14 +35,16 @@ public class HttpServer {
                         byte[] buffer = new byte[8192];
                         int n = socket.getInputStream().read(buffer);
                         String rawRequest="";
-                        if(n!=-1){
-                            rawRequest = new String(buffer, 0, n);
-                        } else {
+                        if(n==-1) {
                             return;
                         }
+                            rawRequest = new String(buffer, 0, n);
                         try{
                             HttpRequest request = new HttpRequest(rawRequest);
-                            request.info(true);
+//                            request.info(true);
+                            log.info("METHOD: " + request.getMethod());
+                            log.info("URI: " +   request.getUri());
+                            log.info("PARAMETERS: " + request.getParameters());
                             dispatcher.execute(request, socket.getOutputStream());
                         } catch (BadRequestException | BadParametersException | StringIndexOutOfBoundsException e) {
                             send400(socket);
