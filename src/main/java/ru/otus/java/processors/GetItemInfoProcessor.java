@@ -31,6 +31,11 @@ public class GetItemInfoProcessor implements RequestProcessor {
         Integer id = 0;
         if (request.containsParameter("id")) {
 
+            try {
+                id = Integer.valueOf(request.getParameter("id"));
+            } catch (NumberFormatException e){
+                throw new BadParametersException("Параметр id должен быть Integer", "INCORRECT_DATA");
+            }
             Integer finalId = id;
             Item item = items.stream()
                     .filter(i -> i.getId() == finalId)

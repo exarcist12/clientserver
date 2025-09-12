@@ -1,11 +1,15 @@
 package ru.otus.java;
 
 import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.error.BadParametersException;
 import ru.otus.java.error.BadRequestException;
 import ru.otus.java.error.ErrorDto;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +20,7 @@ public class HttpServer {
     private int port;
     private Dispatcher dispatcher;
     private volatile boolean running = true;
-
+    private static final Logger log = LogManager.getLogger(HttpServer.class.getName());
     private final ExecutorService service = Executors.newFixedThreadPool(3);
     public HttpServer(int port) {
         this.port = port;
@@ -25,22 +29,18 @@ public class HttpServer {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Сервер запущен на порту: " + port);
+            log.info("Сервер запущен на порту: " + port);
             while (running) {
                 Socket socket = serverSocket.accept();
                 service.submit(()->{
                     try(socket){
-                        byte[] buffer = new byte[8192];
-                        int n = socket.getInputStream().read(buffer);
-                        String rawRequest="";
-                        if(n!=-1){
-                            rawRequest = new String(buffer, 0, n);
-                        } else {
-                            return;
-                        }
-                        try{
-                            HttpRequest request = new HttpRequest(rawRequest);
-                            request.info(true);
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                        try {
+                            HttpRequest request = HttpRequest.parseRequest(reader);
+                            log.info("METHOD: " + request.getMethod());
+                            log.info("URI: " + request.getUri());
+                            log.info("PARAMETERS: " + request.getParameters());
                             dispatcher.execute(request, socket.getOutputStream());
                         } catch (BadRequestException e) {
                             send400(socket, e.getCode(), e.getMessage());
@@ -49,6 +49,7 @@ public class HttpServer {
                         } catch (StringIndexOutOfBoundsException e) {
                             send400(socket, "BAD_PARAMETERS", "INPUT_INCORRECT");
                         }
+
 
                     } catch (Exception e) {
                         e.printStackTrace();
