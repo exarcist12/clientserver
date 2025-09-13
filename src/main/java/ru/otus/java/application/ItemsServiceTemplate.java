@@ -218,4 +218,21 @@ public class ItemsServiceTemplate {
 
         return getById(item.getId());
     }
+
+
+    public void deleteItem(int id){
+        try (PreparedStatement ps = connection.prepareStatement(DELETE_ITEM_CATEGORY)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(DELETE_ITEM)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

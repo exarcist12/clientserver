@@ -23,6 +23,7 @@ public class Dispatcher {
         this.processors.put("GET /items", new GetItemInfoProcessor());
         this.processors.put("POST /items", new CreateNewItemProcessor());
         this.processors.put("PUT /items", new EditItemProcessor());
+        this.processors.put("DELETE /items", new DeleteItemInfoProcessor());
         this.defaultNotFoundProcessor = new DefaultNotFoundProcessor();
         this.defaultStaticResourcesProcessor = new DefaultStaticResourcesProcessor();
     }
