@@ -9,7 +9,6 @@ public class Item {
     private Integer id;
     private String title;
     private Integer price;
- //   private int[] categories = new int[]{4, 10, 15};
 
     private List<String> categories = new ArrayList<>();
 
@@ -47,13 +46,6 @@ public class Item {
 
     public Item() {
     }
-
-//    public Item(Long id, String title, BigDecimal price, int[] categories) {
-//        this.id = id;
-//        this.title = title;
-//        this.price = price;
-//        this.categories = categories;
-//    }
 
     public Item(Integer id, String title, Integer price, List<String> categories) {
         this.id = id;

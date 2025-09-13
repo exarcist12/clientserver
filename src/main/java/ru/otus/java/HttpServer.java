@@ -18,13 +18,23 @@ import java.util.concurrent.Executors;
 
 public class HttpServer {
     private int port;
+    private int maxRequestSize;
+    private int maxResponseSize;
     private Dispatcher dispatcher;
     private volatile boolean running = true;
     private static final Logger log = LogManager.getLogger(HttpServer.class.getName());
-    private final ExecutorService service = Executors.newFixedThreadPool(3);
+    private ExecutorService service;
     public HttpServer(int port) {
         this.port = port;
         this.dispatcher = new Dispatcher();
+    }
+
+    public HttpServer(int port, int maxRequestSize, int maxResponseSize, int threadPoolSize) {
+        this.port = port;
+        this.maxRequestSize = maxRequestSize;
+        this.maxResponseSize = maxResponseSize;
+        this.dispatcher = new Dispatcher();
+        this.service = Executors.newFixedThreadPool(threadPoolSize);
     }
 
     public void start() {
