@@ -48,11 +48,6 @@ public class HttpRequest {
         return this.parameters;
     }
 
-//    public HttpRequest(String rawRequest) {
-//        this.rawRequest = rawRequest;
-//        this.parameters = new HashMap<>();
-//        this.parse();
-//    }
 
 
     public HttpRequest(String method, String uri, Map<String, String> headers, Map<String, String> parameters,String body){
@@ -81,44 +76,6 @@ public class HttpRequest {
         } else  this.parameters = parameters;
 
     }
-
-//    private void parse() {
-//        int startIndex = rawRequest.indexOf(' ');
-//        int endIndex = rawRequest.indexOf(' ', startIndex + 1);
-//        method = rawRequest.substring(0, startIndex);
-//        String path  = rawRequest.substring(startIndex + 1, endIndex);
-//        String[] split = path.split("/");
-//        if(split.length>0){
-//            uri = "/" + split[1];
-//        }
-//        if(split.length>2) {
-//            addResource = "/" + split[2];
-//        }
-//        body = rawRequest.substring(rawRequest.indexOf("\r\n\r\n") + 4);
-//        String[] parts = rawRequest.split("\r\n", 2);
-//        String heads = parts[1];
-//        String[] partsHeads = heads.split("\r\n\r\n", 2);
-//        String onlyHeads = partsHeads[0];
-//        String[] pairHeads = onlyHeads.split("\r\n");
-//        for(String h : pairHeads){
-//            String[] keyValue = h.split(": ");
-//            headers.put(keyValue[0], keyValue[1]);
-//        }
-//
-//        if (uri.contains("?")) {
-//            String[] elements = uri.split("[?]");
-//            uri = elements[0];
-//            String[] keysValues = elements[1].split("&");
-//            for (String o : keysValues) {
-//                String[] keyValue = o.split("=");
-//                try {
-//                    parameters.put(keyValue[0], keyValue[1]);
-//                } catch (ArrayIndexOutOfBoundsException e){
-//                    throw new BadParametersException("Ошибка параметров", "INCORRECT PARAMETERS");
-//                }
-//            }
-//        }
-//    }
 
 
     public static HttpRequest parseRequest(BufferedReader reader) throws IOException {
