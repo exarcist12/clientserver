@@ -31,11 +31,18 @@ public class ItemsServiceTemplate {
             "WHERE i.id = ?";
 
     private static final String ADD_ITEM = "INSERT INTO item (title, price) VALUES (?, ?);";
+
+    private static final String ADD_ITEM_WITH_ID = "INSERT INTO item (id, title, price) VALUES (?, ?, ?);";
+
     private static final String ADD_CATEGORY = "INSERT INTO category (category) VALUES (?);";
     private static final String ADD_ITEM_CATEGORY = "INSERT INTO item_category (item_id, category_id) VALUES (?, ?);";
 
     private static final String GET_ALL_CATEGORY = "select category from category";
     private static final String GET_CATEGORY = "select id from category where category =?";
+
+    private static final String DELETE_ITEM_CATEGORY = "delete from item_category where item_id = ?";
+
+    private static final String DELETE_ITEM = "delete from item where id = ?";
 
     private final Connection connection;
 
@@ -148,5 +155,67 @@ public class ItemsServiceTemplate {
         items = getAllItems();
         return getAllItems().stream().filter(p1->p1.getTitle().equals(item.getTitle())).findFirst().get();
 
+    }
+
+    public Item updateItem(Item item){
+        try (PreparedStatement ps = connection.prepareStatement(DELETE_ITEM_CATEGORY)) {
+            ps.setInt(1, item.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(DELETE_ITEM)) {
+            ps.setInt(1, item.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(ADD_ITEM_WITH_ID)) {
+            ps.setInt(1, item.getId());
+            ps.setString(2, item.getTitle());
+            ps.setInt(3, item.getPrice());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (String category : item.getCategories()){
+            if(!getCategories().contains(category)) {
+                try (PreparedStatement ps = connection.prepareStatement(ADD_CATEGORY)) {
+                    ps.setString(1, category);
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        for (String category : item.getCategories()){
+            int idCategory = 0;
+            try (PreparedStatement ps = connection.prepareStatement(GET_CATEGORY)) {
+                ps.setString(1, category);
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    while (resultSet.next()) {
+                        idCategory = Integer.valueOf(resultSet.getString("id"));;
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+
+            try (PreparedStatement ps = connection.prepareStatement(ADD_ITEM_CATEGORY)) {
+                ps.setInt(1, item.getId());
+                ps.setInt(2, idCategory);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        return getById(item.getId());
     }
 }
