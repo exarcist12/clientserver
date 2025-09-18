@@ -6,5 +6,5 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public interface RequestProcessor {
-    void execute(HttpRequest request, OutputStream output) throws IOException;
+    void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException;
 }

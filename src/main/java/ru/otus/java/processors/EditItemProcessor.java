@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import ru.otus.java.HttpRequest;
 import ru.otus.java.application.ItemsServiceTemplate;
 import ru.otus.java.application.dtos.Item;
+import ru.otus.java.error.BadParametersException;
 import ru.otus.java.error.BadRequestException;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class EditItemProcessor implements RequestProcessor {
     }
 
     @Override
-    public void execute(HttpRequest request, OutputStream output) throws IOException {
+    public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
         Item item;
         Gson gson = new Gson();
         try {
@@ -48,6 +49,13 @@ public class EditItemProcessor implements RequestProcessor {
                 "Content-Type: application/json\r\n" +
                 "\r\n" +
                 jsonItem;
+
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+
+        if (responseBytes.length > maxResponseSize) {
+            throw new BadParametersException("Ответ превышает maxLarge", "INCORRECT_DATA");
+        }
+
         output.write(response.getBytes(StandardCharsets.UTF_8));
     }
 }

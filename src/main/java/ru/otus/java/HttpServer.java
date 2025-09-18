@@ -47,11 +47,11 @@ public class HttpServer {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                         try {
-                            HttpRequest request = HttpRequest.parseRequest(reader);
+                            HttpRequest request = HttpRequest.parseRequest(reader, maxRequestSize);
                             log.info("METHOD: " + request.getMethod());
                             log.info("URI: " + request.getUri());
                             log.info("PARAMETERS: " + request.getParameters());
-                            dispatcher.execute(request, socket.getOutputStream());
+                            dispatcher.execute(request, socket.getOutputStream(), maxResponseSize);
                         } catch (BadRequestException e) {
                             send400(socket, e.getCode(), e.getMessage());
                         } catch (BadParametersException e) {

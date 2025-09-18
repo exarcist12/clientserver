@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 public class CalculatorProcessor implements RequestProcessor {
     @Override
-    public void execute(HttpRequest request, OutputStream output) throws IOException {
+    public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
         int a;
         int b;
         if (!request.containsParameter("a")) {
@@ -40,6 +40,14 @@ public class CalculatorProcessor implements RequestProcessor {
                 "Content-Type: text/html\r\n" +
                 "\r\n" +
                 "<html><body><h1>" + result + "</h1></body></html>";
+
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+
+        if (responseBytes.length > maxResponseSize) {
+            throw new BadParametersException("Ответ превышает maxLarge", "INCORRECT_DATA");
+        }
+
+
         output.write(response.getBytes(StandardCharsets.UTF_8));
     }
 }

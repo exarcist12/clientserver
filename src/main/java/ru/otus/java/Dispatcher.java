@@ -28,14 +28,14 @@ public class Dispatcher {
         this.defaultStaticResourcesProcessor = new DefaultStaticResourcesProcessor();
     }
 
-    public void execute(HttpRequest request, OutputStream output) throws IOException {
+    public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
         if (!processors.containsKey(request.getRoutingKey())) {
-            defaultNotFoundProcessor.execute(request, output);
+            defaultNotFoundProcessor.execute(request, output, maxResponseSize);
             return;
         }
 
         try {
-            processors.get(request.getRoutingKey()).execute(request, output);
+            processors.get(request.getRoutingKey()).execute(request, output, maxResponseSize);
         } catch (BadRequestException e){
             ErrorDto errorDto = new ErrorDto(e.getCode() , e.getMessage());
             Gson gson = new Gson();

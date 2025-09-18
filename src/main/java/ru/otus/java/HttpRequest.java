@@ -78,7 +78,7 @@ public class HttpRequest {
     }
 
 
-    public static HttpRequest parseRequest(BufferedReader reader) throws IOException {
+    public static HttpRequest parseRequest(BufferedReader reader, int maxRequestSize) throws IOException {
         StringBuilder rawRequest = new StringBuilder();
         Map<String, String> headers = new HashMap<>();
         Map<String, String> parameters = new HashMap<>();
@@ -122,8 +122,10 @@ public class HttpRequest {
                 }
             }
         }
-        // Чтение и обработка заголовков
+
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
+
+
             String[] keyValue = line.split(": ");
             headers.put(keyValue[0], keyValue[1]);
             rawRequest.append(line).append("\r\n");
@@ -134,6 +136,9 @@ public class HttpRequest {
                     log.error("Неверный формат Content-Length", e);
                     contentLength = -1;
                 }
+            }
+            if (contentLength > maxRequestSize) {
+                throw new BadRequestException("REQUEST_TOO_LARGE", "Request size exceeds maximum allowed size");
             }
         }
         rawRequest.append("\r\n");

@@ -22,7 +22,7 @@ public class GetItemInfoProcessor implements RequestProcessor {
     }
 
     @Override
-    public void execute(HttpRequest request, OutputStream output) throws IOException {
+    public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
 
         List<Item> items = itemsServiceTemplate.getAllItems();
 
@@ -66,6 +66,13 @@ public class GetItemInfoProcessor implements RequestProcessor {
                 "Content-Type: application/json\r\n" +
                 "\r\n" +
                 result;
+
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+
+        if (responseBytes.length > maxResponseSize) {
+            throw new BadParametersException("Ответ превышает maxLarge", "INCORRECT_DATA");
+        }
+
         output.write(response.getBytes(StandardCharsets.UTF_8));
     }
 }
