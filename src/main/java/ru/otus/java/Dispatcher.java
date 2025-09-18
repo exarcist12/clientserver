@@ -8,6 +8,9 @@ import ru.otus.java.processors.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +32,11 @@ public class Dispatcher {
     }
 
     public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
+        if (Files.exists(Paths.get("static/", request.getUri().substring(1)))){
+            defaultStaticResourcesProcessor.execute(request, output, maxResponseSize);
+            return;
+        }
+
         if (!processors.containsKey(request.getRoutingKey())) {
             defaultNotFoundProcessor.execute(request, output, maxResponseSize);
             return;

@@ -56,7 +56,7 @@ public class DeleteItemInfoProcessor implements RequestProcessor {
                     "HTTP/1.1 200 OK\r\n" +
                     "Content-Type: application/json\r\n" +
                     "\r\n" +
-                    "Пользователь удален";
+                    "{\"result\":\"Пользователь удален\"}";
 
             byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
 
