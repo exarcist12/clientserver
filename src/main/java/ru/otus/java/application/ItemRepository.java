@@ -1,17 +1,24 @@
 package ru.otus.java.application;
 
+import ru.otus.java.Application;
 import ru.otus.java.application.dtos.Item;
 import ru.otus.java.application.dtos.ItemMapper;
+import ru.otus.java.error.BadParametersException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ItemsServiceTemplate {
+public class ItemRepository {
 
-    private static final String DATABASE_URL = "jdbc:postgresql://localhost:5432/otus-db";
-    private static final String DATABASE_USER = "admin";
-    private static final String DATABASE_PASSWORD = "password";
+    static Properties properties = new Properties();
+
+    private static final String DATABASE_URL = properties.getProperty("database.url", "jdbc:postgresql://localhost:5432/otus-db");
+    private static final String DATABASE_USER = properties.getProperty("database.user", "admin");
+    private static final String DATABASE_PASSWORD = properties.getProperty("database.password", "password");
     private static final String ITEMS_CATEGORIES = "SELECT \n" +
             "    i.id AS item_id,\n" +
             "    i.title,\n" +
@@ -46,7 +53,7 @@ public class ItemsServiceTemplate {
 
     private final Connection connection;
 
-    public ItemsServiceTemplate() {
+    public ItemRepository() {
         try{
             connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
         } catch (SQLException e) {
@@ -134,7 +141,11 @@ public class ItemsServiceTemplate {
                 ps.setString(1, category);
                 try (ResultSet resultSet = ps.executeQuery()) {
                     while (resultSet.next()) {
-                        idCategory = Integer.valueOf(resultSet.getString("id"));;
+                        try {
+                            idCategory = Integer.valueOf(resultSet.getString("id"));
+                        } catch (NumberFormatException e){
+                            throw new BadParametersException("Параметр id должен быть Integer", "INCORRECT_DATA");
+                        }
                     }
                 }
             } catch (SQLException e) {

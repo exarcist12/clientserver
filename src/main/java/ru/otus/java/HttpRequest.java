@@ -10,6 +10,7 @@ import ru.otus.java.error.ErrorDto;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,20 +91,88 @@ public class HttpRequest {
             throw new BadRequestException("Некорректный запрос: пустая строка", "EMPTY_REQUEST");
         }
         int contentLength = -1;
-        int indexOfSpace = line.indexOf(" ");
-        final String method = line.substring(0, indexOfSpace);
+        final String method = getMethod(line);
+        String uri = getUri(line);
+        String addResource = getResource(uri);
+        parameters = getParameters(uri);
+        uri = getUriWithoutResourceWithoutParam(uri);
+
+        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+
+            Map.Entry<String, String> entry = getHeader(line);
+            headers.put(entry.getKey(), entry.getValue());
+            rawRequest.append(line).append("\r\n");
+            contentLength = checkMaxSizeContent(line, maxRequestSize);
+        }
+
+        String body = getBody(reader);
+
+        HttpRequest httpRequest;
+        if(addResource!=null){
+            httpRequest = new HttpRequest(method, uri, addResource, headers, parameters, body);
+        } else  httpRequest = new HttpRequest(method, uri, headers, parameters, body);
+        return httpRequest;
+    }
+
+
+    public boolean containsParameter(String key) {
+        return parameters.containsKey(key);
+    }
+
+    public void info(boolean debug) {
+        if (debug) {
+            log.info(rawRequest);
+        }
+        log.info("METHOD: " + method);
+        log.info("URI: " + uri);
+        log.info("PARAMETERS: " + parameters);
+    }
+
+    private static String getUri(String line){
+
         int firstSpaceIndex = line.indexOf(" ");
         int secondSpaceIndex = line.indexOf(" ", firstSpaceIndex + 1);
         String uri = line.substring(firstSpaceIndex + 1, secondSpaceIndex);
-        String addResource = null;
+
+        return uri;
+    }
+
+    private static String getMethod(String line){
+
+        int indexOfSpace = line.indexOf(" ");
+        final String method = line.substring(0, indexOfSpace);
+
+        return method;
+    }
+
+    private static String getUriWithoutResourceWithoutParam(String uri){
+
         String[] split = uri.split("/");
         if(split.length>0){
             uri = "/" + split[1];
         }
+
+        if (uri.contains("?")) {
+            String[] elements = uri.split("[?]");
+            uri = elements[0];
+        }
+        return uri;
+    }
+
+    private static String getResource(String uri){
+
+        String addResource = null;
+        String[] split = uri.split("/");
         if(split.length>2) {
             addResource = "/" + split[2];
         }
 
+        return addResource;
+    }
+
+
+    private static Map<String, String> getParameters(String uri){
+        Map<String, String> parameters = new HashMap<>();
         if (uri.contains("?")) {
             String[] elements = uri.split("[?]");
             uri = elements[0];
@@ -123,26 +192,32 @@ public class HttpRequest {
             }
         }
 
-        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+        return parameters;
+    }
 
-
-            String[] keyValue = line.split(": ");
-            headers.put(keyValue[0], keyValue[1]);
-            rawRequest.append(line).append("\r\n");
-            if (line.startsWith("Content-Length:")) {
-                try {
-                    contentLength = Integer.parseInt(line.substring("Content-Length:".length()).trim());
-                } catch (NumberFormatException e) {
-                    log.error("Неверный формат Content-Length", e);
-                    contentLength = -1;
-                }
-            }
-            if (contentLength > maxRequestSize) {
-                throw new BadRequestException("REQUEST_TOO_LARGE", "Request size exceeds maximum allowed size");
+    private static int checkMaxSizeContent(String line, int maxRequestSize){
+        int contentLength = -1;
+        if (line.startsWith("Content-Length:")) {
+            try {
+                contentLength = Integer.parseInt(line.substring("Content-Length:".length()).trim());
+            } catch (NumberFormatException e) {
+                log.error("Неверный формат Content-Length", e);
+                contentLength = -1;
             }
         }
-        rawRequest.append("\r\n");
+        if (contentLength > maxRequestSize) {
+            throw new BadRequestException("REQUEST_TOO_LARGE", "Request size exceeds maximum allowed size");
+        }
+        return contentLength;
 
+    }
+
+    public static Map.Entry<String, String> getHeader(String line) {
+        String[] keyValue = line.split(": ");
+        return new AbstractMap.SimpleEntry<>(keyValue[0], keyValue[1]);
+    }
+
+    public static String getBody(BufferedReader reader) throws IOException {
         StringBuilder body = new StringBuilder();
         while (reader.ready()) {
             int c = reader.read();
@@ -152,26 +227,7 @@ public class HttpRequest {
                 break;
             }
         }
-        rawRequest.append(body);
-
-        String finalRawRequest = rawRequest.toString();
-        HttpRequest httpRequest;
-        if(addResource!=null){
-            httpRequest = new HttpRequest(method, uri, addResource, headers, parameters, body.toString());
-        } else  httpRequest = new HttpRequest(method, uri, headers, parameters, body.toString());
-        return httpRequest;
-    }
-    public boolean containsParameter(String key) {
-        return parameters.containsKey(key);
-    }
-
-    public void info(boolean debug) {
-        if (debug) {
-            log.info(rawRequest);
-        }
-        log.info("METHOD: " + method);
-        log.info("URI: " + uri);
-        log.info("PARAMETERS: " + parameters);
+        return body.toString();
     }
 }
 

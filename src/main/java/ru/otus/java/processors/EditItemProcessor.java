@@ -3,7 +3,7 @@ package ru.otus.java.processors;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import ru.otus.java.HttpRequest;
-import ru.otus.java.application.ItemsServiceTemplate;
+import ru.otus.java.application.ItemRepository;
 import ru.otus.java.application.dtos.Item;
 import ru.otus.java.error.BadParametersException;
 import ru.otus.java.error.BadRequestException;
@@ -11,12 +11,10 @@ import ru.otus.java.error.BadRequestException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EditItemProcessor implements RequestProcessor {
 
-    ItemsServiceTemplate itemsServiceTemplate = new ItemsServiceTemplate();
+    ItemRepository itemRepository = new ItemRepository();
 
     public EditItemProcessor() {
     }
@@ -42,7 +40,7 @@ public class EditItemProcessor implements RequestProcessor {
 
 //        item = itemsServiceTemplate.getById(Integer.valueOf(request.getParameter("id")));
 
-        itemsServiceTemplate.updateItem(item);
+        itemRepository.updateItem(item);
         String jsonItem = gson.toJson(item);
         String response = "" +
                 "HTTP/1.1 200 OK\r\n" +

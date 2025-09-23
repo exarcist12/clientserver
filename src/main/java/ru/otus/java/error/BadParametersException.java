@@ -1,6 +1,6 @@
 package ru.otus.java.error;
 
-public class BadParametersException extends ArrayIndexOutOfBoundsException{
+public class BadParametersException extends RuntimeException{
     private String code;
 
     public String getCode() {

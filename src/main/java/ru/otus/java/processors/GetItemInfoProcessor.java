@@ -2,21 +2,19 @@ package ru.otus.java.processors;
 
 import com.google.gson.Gson;
 import ru.otus.java.HttpRequest;
-import ru.otus.java.application.ItemsRepository;
-import ru.otus.java.application.ItemsServiceTemplate;
+import ru.otus.java.application.ItemRepository;
 import ru.otus.java.application.dtos.Item;
 import ru.otus.java.error.BadParametersException;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class GetItemInfoProcessor implements RequestProcessor {
 
 
-    ItemsServiceTemplate itemsServiceTemplate = new ItemsServiceTemplate();
+    ItemRepository itemRepository = new ItemRepository();
 
     public GetItemInfoProcessor() {
     }
@@ -24,7 +22,7 @@ public class GetItemInfoProcessor implements RequestProcessor {
     @Override
     public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
 
-        List<Item> items = itemsServiceTemplate.getAllItems();
+        List<Item> items = itemRepository.getAllItems();
 
         String result;
         Gson gson = new Gson();
@@ -58,7 +56,7 @@ public class GetItemInfoProcessor implements RequestProcessor {
             result = gson.toJson(item);
 
         } else {
-            items = itemsServiceTemplate.getAllItems();
+            items = itemRepository.getAllItems();
             result = gson.toJson(items);
         }
         String response = "" +

@@ -1,8 +1,7 @@
 package ru.otus.java.processors;
 
-import com.google.gson.Gson;
 import ru.otus.java.HttpRequest;
-import ru.otus.java.application.ItemsServiceTemplate;
+import ru.otus.java.application.ItemRepository;
 import ru.otus.java.application.dtos.Item;
 import ru.otus.java.error.BadParametersException;
 
@@ -14,7 +13,7 @@ import java.util.List;
 public class DeleteItemInfoProcessor implements RequestProcessor {
 
 
-    ItemsServiceTemplate itemsServiceTemplate = new ItemsServiceTemplate();
+    ItemRepository itemRepository = new ItemRepository();
 
     public DeleteItemInfoProcessor() {
     }
@@ -22,7 +21,7 @@ public class DeleteItemInfoProcessor implements RequestProcessor {
     @Override
     public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
 
-        List<Item> items = itemsServiceTemplate.getAllItems();
+        List<Item> items = itemRepository.getAllItems();
 
         Integer id = 0;
         if (request.containsParameter("id")) {
@@ -51,7 +50,7 @@ public class DeleteItemInfoProcessor implements RequestProcessor {
                     .findFirst()
                     .orElseThrow(() -> new BadParametersException("Пользователя с данным id не существует", "INCORRECT_DATA"));
 
-           itemsServiceTemplate.deleteItem(id);
+           itemRepository.deleteItem(id);
             String response = "" +
                     "HTTP/1.1 200 OK\r\n" +
                     "Content-Type: application/json\r\n" +

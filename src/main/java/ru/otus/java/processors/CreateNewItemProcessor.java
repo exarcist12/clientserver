@@ -3,7 +3,7 @@ package ru.otus.java.processors;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import ru.otus.java.HttpRequest;
-import ru.otus.java.application.ItemsServiceTemplate;
+import ru.otus.java.application.ItemRepository;
 import ru.otus.java.application.dtos.Item;
 import ru.otus.java.error.BadParametersException;
 import ru.otus.java.error.BadRequestException;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class CreateNewItemProcessor implements RequestProcessor {
 
-    ItemsServiceTemplate itemsServiceTemplate = new ItemsServiceTemplate();
+    ItemRepository itemRepository = new ItemRepository();
 
     public CreateNewItemProcessor() {
     }
@@ -24,7 +24,7 @@ public class CreateNewItemProcessor implements RequestProcessor {
     @Override
     public void execute(HttpRequest request, OutputStream output, int maxResponseSize) throws IOException {
         Item item;
-        List<Item> items = itemsServiceTemplate.getAllItems();
+        List<Item> items = itemRepository.getAllItems();
         Gson gson = new Gson();
         try {
             item = gson.fromJson(request.getBody(), Item.class);
@@ -44,7 +44,7 @@ public class CreateNewItemProcessor implements RequestProcessor {
             throw new BadRequestException("Отсутствует обязательное поле price", "INCORRECT_INPUT_DATA");
         }
 
-        itemsServiceTemplate.addNewItem(item);
+        itemRepository.addNewItem(item);
         String jsonItem = gson.toJson(item);
         String response = "" +
                 "HTTP/1.1 200 OK\r\n" +
